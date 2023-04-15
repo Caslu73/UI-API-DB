@@ -5,25 +5,23 @@ import com.library.utility.LibraryAPI_Util;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-import org.hamcrest.Matchers;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-public class APIStepDefs {
+public class US01APIStepDefs{
 
-    RequestSpecification givenPart;
-    Response response;
-    ValidatableResponse thenPart;
+
     /**
      * US 01 RELATED STEPS
      *
      */
+    public static RequestSpecification givenPart;
+    public static Response response;
+    public static ValidatableResponse thenPart;
     @Given("I logged Library api as a {string}")
     public void i_logged_library_api_as_a(String userType) {
 
