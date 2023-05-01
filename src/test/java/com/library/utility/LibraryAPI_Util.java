@@ -2,10 +2,15 @@ package com.library.utility;
 
 import com.github.javafaker.Faker;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 
 public class LibraryAPI_Util {
@@ -79,6 +84,74 @@ public class LibraryAPI_Util {
         userMap.put("address", faker.address().cityName());
 
         return userMap ;
+    }
+    public static String getTokenByRole(String role) {
+        String email = "";
+        String password = "";
+
+        switch (role) {
+            case "librarian":
+                email = "librarian57@library";
+                password = "libraryUser";
+                break;
+
+            case "student":
+                email = "student1@library";
+                password = "libraryUser";
+                break;
+
+            default:
+
+                throw new RuntimeException("Invalid Role Entry :\n>> " + role +" <<");
+        }
+
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("email", email);
+        credentials.put("password", password);
+
+        return given()
+                .contentType(ContentType.URLENC)
+                .formParams(credentials).
+                when()
+                .post("/login").prettyPeek()
+                .then().statusCode(200)
+                .extract().response().path("token") ;
+
+    }
+
+
+    public static RequestSpecification reqSpec(String role){
+
+        return given().log().all()
+                .accept(ContentType.JSON)
+                .header("x-library-token", getTokenByRole(role));
+
+    }
+
+    public static ResponseSpecification resSpec(int statusCode){
+
+        return expect().log().ifValidationFails()
+                .statusCode(statusCode)
+                .contentType(ContentType.JSON);
+
+    }
+
+
+    public static Response getResponse(String role, String endpoint, int statusCode){
+
+        return given().spec(reqSpec(role)).
+                when().get(endpoint).
+                then().spec(resSpec(statusCode))
+                .extract().response();
+
+    }
+    public static Response postResponse(String role,String endpoint,int statusCode){
+
+        return given().spec(reqSpec(role)).
+                when().post(endpoint).
+                then().spec(resSpec(statusCode))
+                .extract().response();
+
     }
 
 
